@@ -20,6 +20,8 @@ const httpServer = createServer(app);
 // This allows Localhost + Main Domain + ANY Vercel Preview URL
 const corsOptions = {
   origin: (origin, callback) => {
+    console.log("Incoming Origin:", origin); // Log for debugging on Render
+
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
@@ -39,14 +41,18 @@ const corsOptions = {
     }
 
     // Block everything else
-    console.log("BLOCKED BY CORS:", origin); // Helps debugging
+    console.log("BLOCKED BY CORS:", origin); 
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 // ✅ 2. Apply Middleware (ONCE)
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -65,7 +71,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "3.0 - Wildcard CORS Fixed",
+    version: "4.0 - CORS Fixed & Logging Enabled",
     environment: process.env.NODE_ENV
   });
 });
