@@ -58,33 +58,22 @@ export const generateToken = (userId) => {
 
 // Set token cookie
 export const setTokenCookie = (res, token) => {
-  // Check if we are in production OR if we are on Render (by checking existence of a Render-specific env var like RENDER or just forcing it)
-  // The logs showed NODE_ENV was 'development' on Render, which breaks the 'none' sameSite policy needed for cross-site cookies.
+  // Determine if we are on localhost based on CLIENT_URL or NODE_ENV
+  // If CLIENT_URL is set to localhost, or undefined but NODE_ENV is dev (and not on Render), assume local.
+  // But for Render, we want to be aggressive about allowing Cross-Site.
   
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || process.env.ON_RENDER === 'true';
+  // We assume we are in "Production/Cloud" mode unless we explicitly see "localhost" in CLIENT_URL
+  const clientUrl = process.env.CLIENT_URL || '';
+  const isLocalhost = clientUrl.includes('localhost') || clientUrl.includes('127.0.0.1');
 
   const options = {
     httpOnly: true,
-    // Cross-site cookies (Vercel -> Render) MUST be Secure and SameSite: None
-    // We will force this if we are not on localhost.
-    secure: isProduction || true, // Always secure for now to ensure it works on Render
-    sameSite: 'none',            // Always 'none' to allow cross-site (required for Vercel -> Render)
+    // If not localhost, we force SafeSite: None + Secure to allow Vercel -> Render cookies
+    secure: !isLocalhost, 
+    sameSite: isLocalhost ? 'lax' : 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };
-  
-  // Note: For SameSite: None to work, Secure MUST be true.
-  // This means on localhost (http), this might fail if not careful.
-  // But we mostly care about the Production fix right now.
-  if (process.env.NODE_ENV === 'development' && !isProduction) {
-     // Localhost fallback
-     options.secure = false;
-     options.sameSite = 'lax';
-  } else {
-     // Force for Render
-     options.secure = true;
-     options.sameSite = 'none';
-  }
 
   res.cookie('token', token, options);
 };
@@ -95,5 +84,7 @@ export const clearTokenCookie = (res) => {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
+    secure: true,
+    sameSite: 'none'
   });
 };
