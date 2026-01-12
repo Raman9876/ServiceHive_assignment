@@ -246,6 +246,83 @@ Confidentiality agreement required.`,
     skills: ['Excel', 'CRM', 'Data Cleaning', 'HubSpot'],
     deadlineDays: 14,
   },
+  {
+    title: 'Python Automation Script for Data Processing',
+    description: `We need a Python developer to create an automation script for processing CSV files and generating reports.
+
+Tasks:
+• Read data from multiple CSV sources
+• Clean and validate data entries
+• Merge datasets and remove duplicates
+• Generate summary reports in Excel format
+• Schedule script to run daily via cron
+
+Technical Requirements:
+- Proficiency in Python 3.x
+- Experience with Pandas and OpenPyXL
+- Understanding of data validation techniques
+- Ability to write clean, documented code`,
+    budget: 1200,
+    category: 'Other',
+    skills: ['Python', 'Pandas', 'Automation', 'Data Processing'],
+    deadlineDays: 14,
+  },
+  {
+    title: 'Custom WordPress Theme Development',
+    description: `Looking for a WordPress expert to convert our Figma design into a fully functional custom theme.
+
+Requirements:
+• Pixel-perfect conversion from Figma mockups
+• Custom post types for portfolio and testimonials
+• Gutenberg blocks for flexible content editing
+• Mobile responsive across all device sizes
+• Optimized for Core Web Vitals and SEO
+
+Please provide links to previous WordPress themes you have developed. Budget is negotiable for exceptional candidates.`,
+    budget: 2500,
+    category: 'Web Development',
+    skills: ['WordPress', 'PHP', 'Gutenberg', 'Responsive Design'],
+    deadlineDays: 30,
+  },
+  {
+    title: 'Social Media Management and Content Creation',
+    description: `We are seeking a social media specialist to manage our brand presence across multiple platforms.
+
+Scope of Work:
+• Manage Instagram, Twitter, LinkedIn, and TikTok accounts
+• Create 20 posts per month with custom graphics
+• Engage with followers and respond to comments
+• Monthly analytics reports and strategy recommendations
+• Hashtag research and trend monitoring
+
+Requirements:
+- 2+ years social media management experience
+- Strong copywriting and visual design skills
+- Knowledge of scheduling tools (Buffer, Hootsuite)
+- Experience with B2B tech companies preferred`,
+    budget: 1800,
+    category: 'Digital Marketing',
+    skills: ['Social Media', 'Content Creation', 'Copywriting', 'Analytics'],
+    deadlineDays: 30,
+  },
+  {
+    title: 'AWS Infrastructure Setup and DevOps Support',
+    description: `Seeking an experienced DevOps engineer to set up our cloud infrastructure on AWS.
+
+Responsibilities:
+• Design and implement VPC architecture
+• Set up EC2 instances with auto-scaling groups
+• Configure RDS PostgreSQL with read replicas
+• Implement CI/CD pipeline using GitHub Actions
+• Set up monitoring with CloudWatch and alerts
+• Document all infrastructure as Terraform code
+
+Must have AWS certification or equivalent experience. Security best practices are a must.`,
+    budget: 5500,
+    category: 'Web Development',
+    skills: ['AWS', 'Terraform', 'Docker', 'CI/CD', 'Linux'],
+    deadlineDays: 45,
+  },
 ];
 
 const bidMessages = [
