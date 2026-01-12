@@ -60,8 +60,10 @@ export const generateToken = (userId) => {
 export const setTokenCookie = (res, token) => {
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    // In production (Render + Vercel), we need 'none' for cross-site cookies
+    // Localhost development can use 'lax'
+    secure: process.env.NODE_ENV === 'production', 
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };

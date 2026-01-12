@@ -71,7 +71,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "4.0 - CORS Fixed & Logging Enabled",
+    version: "5.0 - CORS Fixed & Cross-Site Cookies Enabled",
     environment: process.env.NODE_ENV
   });
 });
