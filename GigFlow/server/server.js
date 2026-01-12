@@ -100,7 +100,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "11.0 - BEARER TOKEN AUTH",
+    version: "12.0 - SOCKET AUTH + CONFETTI FIX",
     environment: process.env.NODE_ENV,
     suggested_url: "https://servicehive-assignment.onrender.com/api"
   });

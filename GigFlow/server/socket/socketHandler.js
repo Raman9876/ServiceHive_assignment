@@ -6,18 +6,29 @@ export const initializeSocket = (io) => {
   // Authentication middleware for socket connections
   io.use(async (socket, next) => {
     try {
-      const cookies = socket.handshake.headers.cookie;
-      if (!cookies) {
+      let token = null;
+
+      // Method 1: Get token from socket handshake auth (Bearer token from client)
+      if (socket.handshake.auth && socket.handshake.auth.token) {
+        token = socket.handshake.auth.token;
+      }
+      
+      // Method 2: Fallback to cookies (for same-origin)
+      if (!token) {
+        const cookies = socket.handshake.headers.cookie;
+        if (cookies) {
+          const tokenCookie = cookies.split(';').find((c) => c.trim().startsWith('token='));
+          if (tokenCookie) {
+            token = tokenCookie.split('=')[1];
+          }
+        }
+      }
+
+      if (!token) {
+        console.log('Socket auth: No token provided');
         return next(new Error('Authentication required'));
       }
 
-      // Parse cookies
-      const tokenCookie = cookies.split(';').find((c) => c.trim().startsWith('token='));
-      if (!tokenCookie) {
-        return next(new Error('Authentication required'));
-      }
-
-      const token = tokenCookie.split('=')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.userId);
 
@@ -27,6 +38,7 @@ export const initializeSocket = (io) => {
 
       socket.userId = user._id.toString();
       socket.user = user;
+      console.log(`Socket authenticated: ${user.name}`);
       next();
     } catch (error) {
       console.error('Socket auth error:', error.message);

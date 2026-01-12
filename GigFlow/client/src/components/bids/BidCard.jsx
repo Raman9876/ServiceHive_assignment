@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import { hireBid } from "../../store/slices/bidSlice";
 import { updateCurrentGigStatus, fetchGig } from "../../store/slices/gigSlice";
 import { DollarSign, Clock, CheckCircle, Loader2, XCircle } from "lucide-react";
@@ -66,6 +67,42 @@ const BidCard = ({ bid, isOwner, gigStatus, gigId, onHireComplete }) => {
 
       // Immediately update local state to show "Hired"
       setLocalStatus("hired");
+
+      // 🎉 Trigger confetti celebration for the client!
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#10b981", "#fbbf24", "#ff4d00", "#00d4ff"],
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ["#10b981", "#34d399", "#6ee7b7"],
+        });
+      }, 200);
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ["#ff4d00", "#00d4ff", "#a855f7"],
+        });
+      }, 400);
+
+      // Show success toast
+      toast.success(`Successfully hired ${bid.freelancer?.name}! 🎉`, {
+        duration: 5000,
+        style: {
+          background: "#10b981",
+          color: "#fff",
+          fontWeight: "bold",
+        },
+      });
 
       // Update gig status in Redux
       dispatch(
@@ -163,9 +200,7 @@ const BidCard = ({ bid, isOwner, gigStatus, gigId, onHireComplete }) => {
 
         {/* Proposal Message */}
         <div className="mb-4">
-          <h5 className="text-xs font-mono text-glow-cyan mb-2">
-            PROPOSAL
-          </h5>
+          <h5 className="text-xs font-mono text-glow-cyan mb-2">PROPOSAL</h5>
           <p className="text-sm text-text-secondary leading-relaxed">
             {bid.message}
           </p>

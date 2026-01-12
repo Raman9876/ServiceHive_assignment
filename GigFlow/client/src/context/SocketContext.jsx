@@ -67,12 +67,18 @@ export const SocketProvider = ({ children }) => {
           import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")) ||
         window.location.protocol + "//" + window.location.hostname + ":5000";
 
+      // Get token from localStorage for socket authentication
+      const token = localStorage.getItem("token");
+
       const newSocket = io(SOCKET_URL, {
         withCredentials: true,
         autoConnect: true,
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+        auth: {
+          token: token, // Pass token for authentication
+        },
       });
 
       newSocket.on("connect", () => {
