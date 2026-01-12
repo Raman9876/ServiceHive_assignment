@@ -100,7 +100,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "8.0 - URL MISMATCH FIX",
+    version: "9.0 - COOKIE FIX",
     environment: process.env.NODE_ENV,
     suggested_url: "https://servicehive-assignment.onrender.com/api"
   });

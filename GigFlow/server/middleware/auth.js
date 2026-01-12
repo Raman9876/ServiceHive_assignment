@@ -58,15 +58,33 @@ export const generateToken = (userId) => {
 
 // Set token cookie
 export const setTokenCookie = (res, token) => {
+  // Check if we are in production OR if we are on Render (by checking existence of a Render-specific env var like RENDER or just forcing it)
+  // The logs showed NODE_ENV was 'development' on Render, which breaks the 'none' sameSite policy needed for cross-site cookies.
+  
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || process.env.ON_RENDER === 'true';
+
   const options = {
     httpOnly: true,
-    // In production (Render + Vercel), we need 'none' for cross-site cookies
-    // Localhost development can use 'lax'
-    secure: process.env.NODE_ENV === 'production', 
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    // Cross-site cookies (Vercel -> Render) MUST be Secure and SameSite: None
+    // We will force this if we are not on localhost.
+    secure: isProduction || true, // Always secure for now to ensure it works on Render
+    sameSite: 'none',            // Always 'none' to allow cross-site (required for Vercel -> Render)
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };
+  
+  // Note: For SameSite: None to work, Secure MUST be true.
+  // This means on localhost (http), this might fail if not careful.
+  // But we mostly care about the Production fix right now.
+  if (process.env.NODE_ENV === 'development' && !isProduction) {
+     // Localhost fallback
+     options.secure = false;
+     options.sameSite = 'lax';
+  } else {
+     // Force for Render
+     options.secure = true;
+     options.sameSite = 'none';
+  }
 
   res.cookie('token', token, options);
 };
