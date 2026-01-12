@@ -8,7 +8,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import gigRoutes from './routes/gigs.js';
 import bidRoutes from './routes/bids.js';
-import { initializeSocket, emitHireNotification } from './socket/socketHandler.js';
+import { initializeSocket } from './socket/socketHandler.js'; // Removed emitHireNotification if not used here
 
 dotenv.config();
 connectDB();
@@ -16,13 +16,26 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
-// 1. Define allowed origins FIRST
+// 1. Define allowed origins (Includes both your Vercel URL and Localhost)
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://service-hive-assignment-five.vercel.app"
+  "https://service-hive-assignment-five.vercel.app",
+  "https://service-hive-assignment-9ops9qnwd-ramans-projects-32c978d7.vercel.app" // Your specific preview URL
 ];
 
-// 2. Initialize Socket.io SECOND (Create 'io')
+// 2. Configure Express CORS
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// 3. Initialize Socket.io (MUST be done before using it)
 const io = new Server(httpServer, {
   cors: {
     origin: allowedOrigins,
@@ -30,29 +43,18 @@ const io = new Server(httpServer, {
   },
 });
 
-// 3. Initialize socket handlers THIRD (Use 'io')
+// 4. Initialize socket handlers
 initializeSocket(io); 
 
 // Make io accessible in routes
 app.set('io', io);
 
-// 4. Configure Express CORS
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// Test Route to verify server is running
+// ... Rest of your routes ...
+// Test Route
 app.get('/api', (req, res) => {
   res.json({ message: "GigFlow API is running successfully!" });
 });
 
-// Request logging in development
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
@@ -60,26 +62,17 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/gigs', gigRoutes);
 app.use('/api/bids', bidRoutes);
 
-// Health check route
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'GigFlow API is running',
-    timestamp: new Date().toISOString(),
-  });
+  res.status(200).json({ success: true, message: 'GigFlow API is running' });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 // Global error handler
@@ -91,15 +84,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log(`
-🚀 GigFlow Server running on port ${PORT}
-📊 Environment: ${process.env.NODE_ENV || 'development'}
-🔗 API: http://localhost:${PORT}/api
-⚡ Socket.io: enabled
-  `);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 export { io };
