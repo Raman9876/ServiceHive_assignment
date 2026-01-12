@@ -10,34 +10,36 @@ import gigRoutes from './routes/gigs.js';
 import bidRoutes from './routes/bids.js';
 import { initializeSocket, emitHireNotification } from './socket/socketHandler.js';
 
-// Load env vars
 dotenv.config();
-
-// Connect to database
 connectDB();
 
-// Initialize Express app
 const app = express();
 const httpServer = createServer(app);
 
-// Initialize Socket.io
+// 1. Define allowed origins FIRST
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://service-hive-assignment-five.vercel.app"
+];
+
+// 2. Initialize Socket.io SECOND (Create 'io')
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
-// Initialize socket handlers
-initializeSocket(io);
+// 3. Initialize socket handlers THIRD (Use 'io')
+initializeSocket(io); 
 
 // Make io accessible in routes
 app.set('io', io);
 
-// Middleware
+// 4. Configure Express CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
   })
 );
