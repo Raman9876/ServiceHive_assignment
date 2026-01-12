@@ -13,6 +13,10 @@ import { initializeSocket } from './socket/socketHandler.js';
 dotenv.config();
 connectDB();
 
+console.log("----------------------------------------");
+console.log("🚀 STARTING SERVER - VERSION 6.0 DEBUG");
+console.log("----------------------------------------");
+
 const app = express();
 const httpServer = createServer(app);
 
