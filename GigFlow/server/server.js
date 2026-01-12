@@ -17,41 +17,50 @@ const app = express();
 const httpServer = createServer(app);
 
 // ✅ 1. Define Intelligent CORS Logic
-// This allows Localhost + Main Domain + ANY Vercel Preview URL
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log("Incoming Origin:", origin); // Log for debugging on Render
-
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // 1. Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    // Allow Localhost
-    if (origin.startsWith('http://localhost')) {
+    // 2. Define allowed origins explicitly for clarity
+    const allowed = [
+      "http://localhost:5173",
+      "http://localhost:4173", 
+      "https://service-hive-assignment-five.vercel.app"
+    ];
+
+    // 3. Check exact matches
+    if (allowed.includes(origin)) {
       return callback(null, true);
     }
 
-    // Allow your specific production domain
-    if (origin === "https://service-hive-assignment-five.vercel.app") {
-      return callback(null, true);
-    }
-
-    // Allow ANY Vercel Preview URL (ends with .vercel.app)
+    // 4. Check dynamic matches (All Vercel Previews)
     if (origin.endsWith(".vercel.app")) {
       return callback(null, true);
     }
 
-    // Block everything else
-    console.log("BLOCKED BY CORS:", origin); 
-    return callback(new Error('Not allowed by CORS'));
+    // 5. Check Render Internal URLs (Optional)
+    if (origin.includes("onrender.com")) {
+      return callback(null, true);
+    }
+
+    console.log("🚫 BLOCKED BY CORS:", origin); 
+    return callback(null, false); // Return false instead of Error to avoid crashing some clients
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 };
 
-// ✅ 2. Apply Middleware (ONCE)
+// ✅ 2. Apply Middleware
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+
+// ✅ 2.5 ADD DEBUG HEADER (To prove this code is running)
+app.use((req, res, next) => {
+  res.header("X-Server-Version", "6.0-DEBUG");
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -71,7 +80,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "5.0 - CORS Fixed & Cross-Site Cookies Enabled",
+    version: "6.0 - Debugging Headers Added",
     environment: process.env.NODE_ENV
   });
 });
