@@ -20,6 +20,14 @@ console.log("----------------------------------------");
 const app = express();
 const httpServer = createServer(app);
 
+// ✅ 0. NUCLEAR DEBUGGING MIDDLEWARE
+// If this runs, the logs will show it, and headers will be forced.
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url} | Origin: ${req.headers.origin}`);
+  res.header("X-Debug-Version", "7.0-NUCLEAR");
+  next();
+});
+
 // ✅ 1. Define Intelligent CORS Logic
 const corsOptions = {
   origin: (origin, callback) => {
@@ -84,7 +92,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "6.0 - Debugging Headers Added",
+    version: "7.0 - NUCLEAR DEBUG VERSION",
     environment: process.env.NODE_ENV
   });
 });

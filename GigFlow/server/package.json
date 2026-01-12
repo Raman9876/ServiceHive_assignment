@@ -1,6 +1,6 @@
 {
   "name": "gigflow-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GigFlow Freelance Marketplace Backend",
   "main": "server.js",
   "type": "module",
