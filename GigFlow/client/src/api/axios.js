@@ -9,9 +9,13 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor - Add Bearer token from localStorage
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -22,12 +26,16 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
+    // If login/register response contains token, store it
+    if (response.data?.token) {
+      localStorage.setItem('token', response.data.token);
+    }
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Optionally handle unauthorized access
-      // Could redirect to login or clear auth state
+      // Clear token on unauthorized (expired or invalid)
+      localStorage.removeItem('token');
     }
     return Promise.reject(error);
   }

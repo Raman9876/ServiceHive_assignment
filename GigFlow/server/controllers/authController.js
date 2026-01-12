@@ -28,13 +28,14 @@ export const register = async (req, res) => {
       password,
     });
 
-    // Generate token and set cookie
+    // Generate token and set cookie (also return token in body for cross-origin clients)
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
     res.status(201).json({
       success: true,
       message: 'Account created successfully',
+      token, // Include token in response for localStorage storage
       user: {
         _id: user._id,
         name: user.name,
@@ -108,13 +109,14 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate token and set cookie
+    // Generate token and set cookie (also return token in body for cross-origin clients)
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
     res.status(200).json({
       success: true,
       message: 'Login successful',
+      token, // Include token in response for localStorage storage
       user: {
         _id: user._id,
         name: user.name,

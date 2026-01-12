@@ -100,7 +100,7 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "10.0 - COOKIE LOGIC FINAL",
+    version: "11.0 - BEARER TOKEN AUTH",
     environment: process.env.NODE_ENV,
     suggested_url: "https://servicehive-assignment.onrender.com/api"
   });

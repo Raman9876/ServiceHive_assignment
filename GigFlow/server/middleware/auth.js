@@ -1,13 +1,17 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-// Protect routes - verify JWT from HttpOnly cookie
+// Protect routes - verify JWT from Authorization header OR HttpOnly cookie
 export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from HttpOnly cookie
-    if (req.cookies && req.cookies.token) {
+    // 1. First check Authorization header (Bearer token) - preferred for cross-origin
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    // 2. Fallback to HttpOnly cookie (for same-origin or localhost)
+    else if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
     }
 

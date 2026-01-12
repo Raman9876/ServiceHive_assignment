@@ -35,8 +35,12 @@ export const logout = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await api.post('/auth/logout');
+      // Clear token from localStorage on logout
+      localStorage.removeItem('token');
       return null;
     } catch (error) {
+      // Even if API fails, clear local token
+      localStorage.removeItem('token');
       return rejectWithValue(
         error.response?.data?.message || 'Logout failed'
       );
