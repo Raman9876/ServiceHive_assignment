@@ -18,6 +18,9 @@ console.log("🚀 STARTING SERVER - VERSION 6.0 DEBUG");
 console.log("----------------------------------------");
 
 const app = express();
+// Trust Proxy is REQUIRED for secure cookies on Render/Vercel
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 
 // ✅ 0. NUCLEAR DEBUGGING MIDDLEWARE
