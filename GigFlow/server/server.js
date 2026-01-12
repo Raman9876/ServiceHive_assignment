@@ -59,6 +59,11 @@ const corsOptions = {
       return callback(null, true);
     }
 
+    // 6. Check our specific new Frontend if using custom domain
+    if (origin === "https://servicehive-assignment.onrender.com") {
+       return callback(null, true);
+    }
+
     console.log("🚫 BLOCKED BY CORS:", origin); 
     return callback(null, false); // Return false instead of Error to avoid crashing some clients
   },
@@ -95,8 +100,9 @@ app.set('io', io);
 app.get('/api', (req, res) => {
   res.json({ 
     message: "GigFlow API is running!", 
-    version: "7.0 - NUCLEAR DEBUG VERSION",
-    environment: process.env.NODE_ENV
+    version: "8.0 - URL MISMATCH FIX",
+    environment: process.env.NODE_ENV,
+    suggested_url: "https://servicehive-assignment.onrender.com/api"
   });
 });
 
