@@ -8,7 +8,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import gigRoutes from './routes/gigs.js';
 import bidRoutes from './routes/bids.js';
-import { initializeSocket, emitHireNotification } from './socket/socketHandler.js';
+import { initializeSocket } from './socket/socketHandler.js';
 
 dotenv.config();
 connectDB();
@@ -16,51 +16,58 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
-// 1. Define allowed origins FIRST
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://service-hive-assignment-five.vercel.app",
-  "https://service-hive-assignment-9ops9qnwd-ramans-projects-32c978d7.vercel.app" // Your specific preview URL
-];
+// ✅ 1. Define Intelligent CORS Logic
+// This allows Localhost + Main Domain + ANY Vercel Preview URL
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+    // Allow Localhost
+    if (origin.startsWith('http://localhost')) {
+      return callback(null, true);
+    }
 
+    // Allow your specific production domain
+    if (origin === "https://service-hive-assignment-five.vercel.app") {
+      return callback(null, true);
+    }
+
+    // Allow ANY Vercel Preview URL (ends with .vercel.app)
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    // Block everything else
+    console.log("BLOCKED BY CORS:", origin); // Helps debugging
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+};
+
+// ✅ 2. Apply Middleware (ONCE)
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// 2. Initialize Socket.io SECOND (Create 'io')
+
+// ✅ 3. Initialize Socket.io with SAME CORS options
 const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins,
-    credentials: true,
-  },
+  cors: corsOptions
 });
 
-// 3. Initialize socket handlers THIRD (Use 'io')
+// ✅ 4. Initialize Socket Handlers
 initializeSocket(io); 
-
-// Make io accessible in routes
 app.set('io', io);
 
-// 4. Configure Express CORS
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// Test Route to verify server is running
+// ✅ 5. Test Route (VERSION CHECK)
+// Check this route after deploying to confirm the server updated!
 app.get('/api', (req, res) => {
-  res.json({ message: "GigFlow API is running successfully!" });
+  res.json({ 
+    message: "GigFlow API is running!", 
+    version: "3.0 - Wildcard CORS Fixed",
+    environment: process.env.NODE_ENV
+  });
 });
 
 // Request logging in development
@@ -71,7 +78,7 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-// API Routes
+// ✅ 6. API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/gigs', gigRoutes);
 app.use('/api/bids', bidRoutes);
